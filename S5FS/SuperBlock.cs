@@ -8,12 +8,28 @@ namespace S5FS
 {
     class SuperBlock
     {
+        //Размер ЖД
+        private int HDD_Size;
+        public int HDD_Size_Property
+        {
+            get { return HDD_Size; }
+            set { HDD_Size = value; }
+        }
+
         //Тип ФС
         private string FS_Type;
         public string FS_Type_Property
         {
             get { return FS_Type; }
             set { FS_Type = value; }
+        }
+
+        //Размер кластера(блока)
+        private ushort Block_Size;
+        public ushort Block_Size_Property
+        {
+            get { return Block_Size; }
+            set { Block_Size = value; }
         }
 
         //Размер ФС в блоках
@@ -32,13 +48,6 @@ namespace S5FS
             set { Inode_Size = value; }
         }
 
-        //Размер кластера(блока)
-        private int Block_Size;
-        public int Block_Size_Property
-        {
-            get { return Block_Size; }
-            set { Block_Size = value; }
-        }
 
         //Число свободных блоков
         private int Block_Free;
@@ -54,14 +63,6 @@ namespace S5FS
         {
             get { return Inode_Free; }
             set { Inode_Free = value; }
-        }
-
-        //Размер логического блока
-        private int Block_Log;
-        public int Block_Log_Property
-        {
-            get { return Block_Log; }
-            set { Block_Log = value; }
         }
 
         //Размер битовой карты инодов

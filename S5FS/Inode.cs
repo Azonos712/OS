@@ -9,24 +9,24 @@ namespace S5FS
     class Inode
     {
         //Права доступа
-        private string Access;
-        public string Access_Property
+        private ushort Access;
+        public ushort Access_Property
         {
             get { return Access; }
             set { Access = value; }
         }
 
         //ID владельца
-        private int User_ID;
-        public int User_ID_Property
+        private byte User_ID;
+        public byte User_ID_Property
         {
             get { return User_ID; }
             set { User_ID = value; }
         }
 
         //ID группы
-        private int Group_ID;
-        public int Group_ID_Property
+        private byte Group_ID;
+        public byte Group_ID_Property
         {
             get { return Group_ID; }
             set { Group_ID = value; }
@@ -41,16 +41,16 @@ namespace S5FS
         }
 
         //Дата создания файла
-        private int File_Create;
-        public int File_Create_Property
+        private DateTime File_Create;//8байт
+        public DateTime File_Create_Property
         {
             get { return File_Create; }
             set { File_Create = value; }
         }
 
         //Дата последней модификации файла
-        private int File_Modif;
-        public int File_Modif_Property
+        private DateTime File_Modif;
+        public DateTime File_Modif_Property
         {
             get { return File_Modif; }
             set { File_Modif = value; }

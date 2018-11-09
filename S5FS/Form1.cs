@@ -18,16 +18,30 @@ namespace S5FS
         }
 
         Emulator em = new Emulator();
+        public int temp1;
+        public ushort temp2;
 
         private void button1_Click(object sender, EventArgs e)
         {
             if (em.Path_Property != null)
             {
-                em.CreateMainFile();
+                if (System.IO.File.Exists(em.Path_Property)==true)
+                {
+                    MessageBox.Show("Файл присутствует,считываем данные");
+                    em.ReadMainFile();
+                }
+                else
+                {
+                    MessageBox.Show("Файл отсутствует,создаём файл");
+                    Create nf = new Create();
+                    nf.Owner = this;
+                    nf.ShowDialog();
+                    em.CreateMainFile(temp1, temp2);
+                }
             }
             else
             {
-                MessageBox.Show("Вы не выбрали путь сохранения файла!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Вы не выбрали путь к файлу!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -39,11 +53,6 @@ namespace S5FS
                 em.Path_Property= fbd.SelectedPath + "\\FS.txt";//приписываем к пути выходной файл
                 textBox_path.Text = em.Path_Property;//отображает выбранный путь на форме
             }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
