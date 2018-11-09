@@ -26,7 +26,7 @@ namespace S5FS
             {
                 fs = File.Create(Path_Property);//Создание файла ФС по указаному пути
 
-                //ЗАПИСЬ СУПЕРБЛОКА
+                //ОПРЕДЕЛЕНИЕ СУПЕРБЛОКА
                 SuperBlock SB = new SuperBlock();//Создание объекта СуперБлок
                 SB.HDD_Size_Property = hdd_size*1024*1024;//524288000 Размер жесткого диска
 
@@ -38,14 +38,12 @@ namespace S5FS
                 SB.Inode_Free_Property = (SB.FS_Size_Property/2);//Количество свободных инодов
                 SB.Inode_Bitmap_Size_Property = (SB.FS_Size_Property / 2) / 4;//Размер битовой карты инодов
                 SB.Bitmap_Size_Property = (SB.FS_Size_Property / 4);//Размер битовой карты блоков
-                
                 /*var t = SB.GetType();
                 int TotalSizeSB = 0;
                 foreach (var prop in t.GetFields(System.Reflection.BindingFlags.Instance| System.Reflection.BindingFlags.NonPublic))
                 {
                     TotalSizeSB += System.Runtime.InteropServices.Marshal.SizeOf(prop.GetValue(SB));
                 }Подсчёт размера всех полей*/
-                
                 fs.Write(Encoding.ASCII.GetBytes(SB.FS_Type_Property), 0, Encoding.ASCII.GetBytes(SB.FS_Type_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.Block_Size_Property), 0, BitConverter.GetBytes(SB.Block_Size_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.FS_Size_Property), 0, BitConverter.GetBytes(SB.FS_Size_Property).Length);
@@ -57,17 +55,39 @@ namespace S5FS
                 for (int i = 0; i < SB.Block_Size_Property - 36; i++)
                     fs.WriteByte(0);
 
-                //ЗАПИСЬ БИТОВОЙ КАРТЫ БЛОКОВ
-                for (int i = 0; i < SB.Block_Size_Property; i++)
+                //ОПРЕДЕЛЕНИЕ БИТОВОЙ КАРТЫ БЛОКОВ
+                SB.Bitmap_Block_Size_Property=(SB.Bitmap_Size_Property / SB.Block_Size_Property)+1;
+                for (int i = 0; i < (SB.Bitmap_Block_Size_Property*SB.Block_Size_Property); i++)
                     fs.WriteByte(1);
 
-                //ЗАПИСЬ БИТОВОЙ КАРТЫ ИНОДОВ
-                for (int i = 0; i < SB.Block_Size_Property; i++)
-                    fs.WriteByte(2);
+                //ОПРЕДЕЛЕНИЕ БИТОВОЙ КАРТЫ ИНОДОВ
+                SB.Inode_Bitmap_Block_Size_Property = (SB.Inode_Bitmap_Size_Property / SB.Block_Size_Property) + 1;
+                for (int i = 0; i < SB.Inode_Bitmap_Block_Size_Property*SB.Block_Size_Property; i++)
+                   fs.WriteByte(2);
 
-                //ЗАПИСЬ МАССИВА ИНОДОВ
-                for (int i = 0; i < SB.Block_Size_Property; i++)
-                    fs.WriteByte(2);
+                //ОПРЕДЕЛЕНИЕ МАССИВА ИНОДОВ
+                SB.Inode_Block_Size_Property = (SB.Inode_Size_Property / SB.Block_Size_Property) + 1;
+                for (int i = 0; i < SB.Inode_Block_Size_Property*SB.Block_Size_Property; i++)
+                    fs.WriteByte(3);
+
+                //ОПРЕДЕЛЕНИЕ ИНФОРМАЦИИ ПОЛЬЗОВАТЕЛЕЙ
+                SB.User_Info_Block_Property = ((301 * 100) / SB.Block_Size_Property) + 1;
+                for (int i = 0; i < SB.User_Info_Block_Property * SB.Block_Size_Property; i++)
+                    fs.WriteByte(4);
+
+                //ОПРЕДЕЛЕНИЕ ЗАПИСЕЙ КОРНЕВОГО КАТАЛОГА
+                SB.Record_Block_Property = ((29 * ((SB.FS_Size_Property / 2)/2)) / SB.Block_Size_Property) + 1;
+                for (int i = 0; i < SB.Record_Block_Property * SB.Block_Size_Property; i++)
+                    fs.WriteByte(5);
+
+                //ОПРЕДЕЛЕНИЕ ДАННЫХ
+                SB.Data_Block_Property = SB.FS_Size_Property - 1 - SB.Bitmap_Block_Size_Property -
+                    SB.Inode_Bitmap_Block_Size_Property - SB.Inode_Block_Size_Property - SB.User_Info_Block_Property
+                    - SB.Record_Block_Property;
+                for (int i = 0; i < SB.Data_Block_Property * SB.Block_Size_Property; i++)
+                    fs.WriteByte(6);
+
+                
                 //Comands_fs comand = new Comands_fs();
                 //comand.addInode(1, 0, 0, 777, 1, 0, 1, 2048, 0); //создаем корневой каталог
             }

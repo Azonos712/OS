@@ -8,13 +8,6 @@ namespace S5FS
 {
     class SuperBlock
     {
-        //Размер ЖД
-        private int HDD_Size;
-        public int HDD_Size_Property
-        {
-            get { return HDD_Size; }
-            set { HDD_Size = value; }
-        }
 
         //Тип ФС
         private string FS_Type;
@@ -79,6 +72,65 @@ namespace S5FS
         {
             get { return Bitmap_Size; }
             set { Bitmap_Size = value; }
+        }
+
+        
+        //Данные не хранящиеся в ФС-------------------------------------------------------
+
+        //Размер ЖД
+        private int HDD_Size;
+        public int HDD_Size_Property
+        {
+            get { return HDD_Size; }
+            set { HDD_Size = value; }
+        }
+
+        //Размер битовой карты блоков в блоках
+        private int Bitmap_Block_Size;
+        public int Bitmap_Block_Size_Property
+        {
+            get { return Bitmap_Block_Size; }
+            set { Bitmap_Block_Size = value; }
+        }
+
+        //Размер битовой карты инодов в блоках
+        private int Inode_Bitmap_Block_Size;
+        public int Inode_Bitmap_Block_Size_Property
+        {
+            get { return Inode_Bitmap_Block_Size; }
+            set { Inode_Bitmap_Block_Size = value; }
+        }
+        
+        //Размер массива инодов в блоках
+        private int Inode_Block_Size;
+        public int Inode_Block_Size_Property
+        {
+            get { return Inode_Block_Size; }
+            set { Inode_Block_Size = value; }
+        }
+
+        //Размер информации пользователей в блоках
+        private int User_Info_Block;
+        public int User_Info_Block_Property
+        {
+            get { return User_Info_Block; }
+            set { User_Info_Block = value; }
+        }
+
+        //Размер записей корневого каталога в блоках
+        private int Record_Block;
+        public int Record_Block_Property
+        {
+            get { return Record_Block; }
+            set { Record_Block = value; }
+        }
+
+        //Размер данных в блоках
+        private int Data_Block;
+        public int Data_Block_Property
+        {
+            get { return Data_Block; }
+            set { Data_Block = value; }
         }
     }
 }
