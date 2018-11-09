@@ -64,6 +64,10 @@ namespace S5FS
                 //ЗАПИСЬ БИТОВОЙ КАРТЫ ИНОДОВ
                 for (int i = 0; i < SB.Block_Size_Property; i++)
                     fs.WriteByte(2);
+
+                //ЗАПИСЬ МАССИВА ИНОДОВ
+                for (int i = 0; i < SB.Block_Size_Property; i++)
+                    fs.WriteByte(2);
                 //Comands_fs comand = new Comands_fs();
                 //comand.addInode(1, 0, 0, 777, 1, 0, 1, 2048, 0); //создаем корневой каталог
             }
