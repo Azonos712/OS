@@ -94,7 +94,7 @@
             0,
             0});
             this.numericUpDown1.Minimum = new decimal(new int[] {
-            100,
+            1,
             0,
             0,
             0});
@@ -102,7 +102,7 @@
             this.numericUpDown1.Size = new System.Drawing.Size(157, 22);
             this.numericUpDown1.TabIndex = 26;
             this.numericUpDown1.Value = new decimal(new int[] {
-            100,
+            1,
             0,
             0,
             0});

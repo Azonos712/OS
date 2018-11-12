@@ -16,19 +16,21 @@ namespace S5FS
         {
             InitializeComponent();
         }
-
-        Emulator em = new Emulator();
+        
         public int temp1;
         public ushort temp2;
 
+        private Emulator em = new Emulator();
+        internal Emulator Em { get => em; set => em = value; }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            if (em.Path_Property != null)
+            if (Em.Path_Property != null)
             {
-                if (System.IO.File.Exists(em.Path_Property)==true)
+                if (System.IO.File.Exists(Em.Path_Property)==true)
                 {
                     MessageBox.Show("Файл присутствует,считываем данные");
-                    em.ReadMainFile();
+                    Em.ReadMainFile();
                 }
                 else
                 {
@@ -36,8 +38,11 @@ namespace S5FS
                     Create nf = new Create();
                     nf.Owner = this;
                     nf.ShowDialog();
-                    em.CreateMainFile(temp1, temp2);
+                    Em.CreateMainFile(temp1, temp2);
                 }
+                SignIn si = new SignIn();
+                si.Owner = this;
+                si.ShowDialog();
             }
             else
             {
@@ -50,8 +55,8 @@ namespace S5FS
             FolderBrowserDialog fbd = new FolderBrowserDialog();//предлагает пользователю выбрать папку
             if (fbd.ShowDialog() == DialogResult.OK)
             {
-                em.Path_Property= fbd.SelectedPath + "\\FS.txt";//приписываем к пути выходной файл
-                textBox_path.Text = em.Path_Property;//отображает выбранный путь на форме
+                Em.Path_Property= fbd.SelectedPath + "\\FS.txt";//приписываем к пути выходной файл
+                textBox_path.Text = Em.Path_Property;//отображает выбранный путь на форме
             }
         }
     }

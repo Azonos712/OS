@@ -132,5 +132,21 @@ namespace S5FS
             get { return Data_Block; }
             set { Data_Block = value; }
         }
+
+        //Размер служебной части в блоках
+        private int Service_Block;
+        public int Service_Block_Property
+        {
+            get { return Service_Block; }
+            set { Service_Block = value; }
+        }
+
+        //Количество пользователей
+        private int Number_Users;
+        public int Number_Users_Property
+        {
+            get { return Number_Users; }
+            set { Number_Users = value; }
+        }
     }
 }

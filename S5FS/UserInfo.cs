@@ -33,16 +33,16 @@ namespace S5FS
         }
 
         //Hash
-        private int Hash;
-        public int Hash_Property
+        private byte[] Hash;
+        public byte[] Hash_Property
         {
             get { return Hash; }
             set { Hash = value; }
         }
 
         //Homedir
-        private int Homedir;
-        public int Homedir_Property
+        private string Homedir;
+        public string Homedir_Property
         {
             get { return Homedir; }
             set { Homedir = value; }
