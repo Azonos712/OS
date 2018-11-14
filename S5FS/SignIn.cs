@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,11 +18,28 @@ namespace S5FS
         {
             InitializeComponent();
         }
-        Emulator newem = new Emulator();
+
+        private Emulator em1 = new Emulator();
+        internal Emulator Em1 { get => em1; set => em1 = value; }
+        
+
+
         private void button1_Click(object sender, EventArgs e)
         {
-            string l = newem.Path_Property;
-            bool b=newem.CheckUser(textBox1.Text.ToString(), textBox2.Text.ToString());
+            //Em1.fs_Property = File.OpenRead(Em1.Path_Property);//Чтение файла ФС по указаному пути
+            switch (Em1.CheckUser(textBox2.Text.ToString(), textBox1.Text.ToString()))
+            {
+                case 0:
+                    MessageBox.Show("Неверное имя пользователя!");
+                    break;
+                case 1:
+                    MessageBox.Show("Неверный пароль!");
+                    break;
+                case 2:
+                    MessageBox.Show("Вы вошли в систему!");
+                    break;
+            }
+            //Em1.fs_Property.Close();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -36,7 +54,7 @@ namespace S5FS
             Form1 main = this.Owner as Form1;
             if (main != null)
             {
-                newem = main.Em;
+                Em1 = main.Em;
                 main.Hide();
             }
         }
@@ -45,7 +63,5 @@ namespace S5FS
         {
             Application.Exit();
         }
-
-
     }
 }

@@ -19,7 +19,7 @@ namespace S5FS
         
         public int temp1;
         public ushort temp2;
-
+        
         private Emulator em = new Emulator();
         internal Emulator Em { get => em; set => em = value; }
 

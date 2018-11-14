@@ -20,13 +20,15 @@ namespace S5FS
         }
 
         private FileStream fs;
+        //private FileStream fs=File.Create(Path_Property);
         public FileStream fs_Property
         {
             get { return fs; }
             set { fs = value; }
         }
-
-        SuperBlock SB = new SuperBlock();//Создание объекта СуперБлок
+        
+        private SuperBlock sb = new SuperBlock();//Создание объекта СуперБлок
+        internal SuperBlock SB { get => sb; set => sb = value; }
 
         public void CreateMainFile(int hdd_size, ushort block_size)
         {
@@ -34,6 +36,7 @@ namespace S5FS
 
             try
             {
+                //fs = File.Open(Path_Property, FileMode.Open, FileShare.None);
                 fs = File.Create(Path_Property);//Создание файла ФС по указаному пути
 
                 //ОПРЕДЕЛЕНИЕ СУПЕРБЛОКА
@@ -127,16 +130,16 @@ namespace S5FS
                 //РАЗМЕТКА ИНФОРМАЦИИ ПОЛЬЗОВАТЕЛЕЙ(СОЗДАНИЕ ГЛАВНОГО ПОЛЬЗОВАТЕЛЯ)
                 SB.Number_Users_Property = 0;
                 UserInfo root = new UserInfo();
-                root.ID_Property = 0;
+                root.ID_Property = (byte)SB.numID_Property.First();
+                SB.numID_Property.Remove(root.ID_Property);
                 root.Group_ID_Property = 0;
-                root.Login_Property = "root        ";
+                root.Login_Property = "root";
+                root.Login_Property += (new string(' ', 12 - root.Login_Property.Length));
                 root.Hash_Property = getHashSHA256("root");
-                root.Homedir_Property = "RootDir";
+                root.Homedir_Property = "RootDir\\";
                 root.Homedir_Property += (new string(' ', 255 - root.Homedir_Property.Length));
-                fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
-                + SB.Inode_Block_Size_Property) * SB.Block_Size_Property), SeekOrigin.Begin);
+                
                 AddUser(root);
-                CheckBitMap();
                 
                 //Comands_fs comand = new Comands_fs();
                 //comand.addInode(1, 0, 0, 777, 1, 0, 1, 2048, 0); //создаем корневой каталог
@@ -147,8 +150,8 @@ namespace S5FS
             }
             finally
             {
-                if (fs != null)
-                    fs.Close();
+                //if (fs != null)
+                    //fs.Close();
             }
 
         }
@@ -174,6 +177,11 @@ namespace S5FS
 
         public void AddUser(UserInfo u)
         {
+            //fs.Close();
+            //fs = File.OpenRead(Path_Property);
+            fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
+                + SB.Inode_Block_Size_Property) * SB.Block_Size_Property), SeekOrigin.Begin);
+
             UserInfo temp = new UserInfo();
             for (int i = 0; i < (SB.User_Info_Block_Property * SB.Block_Size_Property); i = (i + 301))
             {
@@ -184,6 +192,9 @@ namespace S5FS
                     break;
                 }
             }
+
+            //fs.Close();
+            //fs = File.OpenWrite(Path_Property);
 
             byte[] b = new byte[1];
             b[0] = u.ID_Property;
@@ -196,10 +207,13 @@ namespace S5FS
             fs.Write(u.Hash_Property, 0, u.Hash_Property.Length);
             fs.Write(Encoding.ASCII.GetBytes(u.Homedir_Property), 0, Encoding.ASCII.GetBytes(u.Homedir_Property).Length);
             SB.Number_Users_Property++;
+            CheckBitMap();
         }
 
         public UserInfo ReadUser()
         {
+            //fs.Close();
+            //fs = File.OpenRead(Path_Property);
             UserInfo temp = new UserInfo();
             byte[] u1 = new byte[1];
             for (int i = 0; i < 1; i++)
@@ -229,24 +243,28 @@ namespace S5FS
             return temp;
         }
 
-        public bool CheckUser(string login, string password)
+        public int CheckUser(string login, string password)
         {
-            fs = File.OpenRead(Path_Property);//Чтение файла ФС по указаному пути
+            //fs.Close();
+            //fs = File.OpenRead(Path_Property);
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
                 + SB.Inode_Block_Size_Property) * SB.Block_Size_Property), SeekOrigin.Begin);
-
-            for(int i =0;i< SB.Number_Users_Property; i++)
+            int r = 0;
+            for (int i =0;i< 100; i++)
             {
                 UserInfo temp = ReadUser();
-                bool s1 = login.Replace(" ", string.Empty) == temp.Login_Property.Replace(" ", string.Empty);
-                bool s2 = temp.Hash_Property.SequenceEqual(getHashSHA256(password)) == true;
-                if (login.Replace(" ", string.Empty) == temp.Login_Property.Replace(" ", string.Empty) && temp.Hash_Property.SequenceEqual(getHashSHA256(password)) == true)
+                if (login.Replace(" ", string.Empty) == temp.Login_Property.Replace(" ", string.Empty))
                 {
-                    return true;
+                    r++;
+                    if (temp.Hash_Property.SequenceEqual(getHashSHA256(password)) == true)
+                    {
+                        r++;
+                    }
+                    return r;
                 }
             }
 
-            return false;
+            return r;
         }
 
         public void CheckBitMap()
@@ -265,6 +283,8 @@ namespace S5FS
                 }
                 else
                 {
+                    //fs.Close();
+                    //fs = File.OpenRead(Path_Property);
                     fs.Seek(i * SB.Block_Size_Property, SeekOrigin.Begin);
                     byte one = (byte)fs.ReadByte();
                     byte two = (byte)fs.ReadByte();
@@ -284,6 +304,8 @@ namespace S5FS
 
                 if (bitcount == 8)
                 {
+                    //fs.Close();
+                    //fs = File.OpenWrite(Path_Property);
                     bitcount = 0;
                     fs.Seek((1 * SB.Block_Size_Property)+CurPos, SeekOrigin.Begin);
                     fs.WriteByte(Convert.ToByte(bits, 2));

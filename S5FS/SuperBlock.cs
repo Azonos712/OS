@@ -8,6 +8,14 @@ namespace S5FS
 {
     class SuperBlock
     {
+        public SuperBlock()
+        {
+            for (int i = 0; i < 100; i++)
+                numID_Property.Add(i);
+
+            for (int i = 0; i < 2; i++)
+                numGroupID_Property.Add(i);
+        }
 
         //Тип ФС
         private string FS_Type;
@@ -74,8 +82,22 @@ namespace S5FS
             set { Bitmap_Size = value; }
         }
 
-        
+
         //Данные не хранящиеся в ФС-------------------------------------------------------
+
+
+        private List<int> numID=new List<int>();//Доступны ID
+        public List<int> numID_Property
+        {
+            get { return numID; }
+            set { numID = value; }
+        }
+        private List<int> numGroupID = new List<int>();//Доступные группы
+        public List<int> numGroupID_Property
+        {
+            get { return numGroupID; }
+            set { numGroupID = value; }
+        }
 
         //Размер ЖД
         private int HDD_Size;

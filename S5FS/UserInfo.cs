@@ -8,6 +8,7 @@ namespace S5FS
 {
     class UserInfo
     {
+        
         //ID пользователя
         private byte ID;
         public byte ID_Property
@@ -47,5 +48,9 @@ namespace S5FS
             get { return Homedir; }
             set { Homedir = value; }
         }
+
+
+        //Данные не хранящиеся в ФС-------------------------------------------------------
+
     }
 }
