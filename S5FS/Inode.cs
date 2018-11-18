@@ -65,11 +65,19 @@ namespace S5FS
         }
 
         //Массив адресов блоков данных файла
-        private int[] A_Block_Address;
+        private int[] A_Block_Address = new int[10];
         public int[] A_Block_Address_Property
         {
             get { return A_Block_Address; }
             set { A_Block_Address = value; }
+        }
+
+        //Номер инода
+        private int Number;
+        public int Number_Property
+        {
+            get { return Number; }
+            set { Number = value; }
         }
     }
 }

@@ -112,7 +112,7 @@ namespace S5FS
         public int Bitmap_Block_Size_Property
         {
             get { return Bitmap_Block_Size; }
-            set { Bitmap_Block_Size = value; }
+           set { Bitmap_Block_Size = value; }
         }
 
         //Размер битовой карты инодов в блоках
