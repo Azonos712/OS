@@ -179,9 +179,7 @@ namespace S5FS
                 inode.Number_Property = getFreeInode();
 
                 AddUser(root, inode);
-
-                //Comands_fs comand = new Comands_fs();
-                //comand.addInode(1, 0, 0, 777, 1, 0, 1, 2048, 0); //создаем корневой каталог
+                
             }
             catch (Exception e)
             {
