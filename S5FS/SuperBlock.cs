@@ -16,66 +16,81 @@ namespace S5FS
             for (int i = 0; i < 2; i++)
                 numGroupID_Property.Add(i);
         }
-
-        //Тип ФС
+        
         private string FS_Type;
+        /// <summary>
+        /// Тип файловой системы (Её название)
+        /// </summary>
         public string FS_Type_Property
         {
             get { return FS_Type; }
             set { FS_Type = value; }
         }
-
-        //Размер кластера(блока)
-        private ushort Block_Size;
-        public ushort Block_Size_Property
+        
+        private ushort One_Block_Size;
+        /// <summary>
+        /// Размер 1 кластера (Блока)
+        /// </summary>
+        public ushort One_Block_Size_Property
         {
-            get { return Block_Size; }
-            set { Block_Size = value; }
+            get { return One_Block_Size; }
+            set { One_Block_Size = value; }
         }
-
-        //Размер ФС в блоках
-        private int FS_Size;
-        public int FS_Size_Property
+        
+        private int FS_Block_Size;
+        /// <summary>
+        /// Размер файловой системы в блоках
+        /// </summary>
+        public int FS_Block_Size_Property
         {
-            get { return FS_Size; }
-            set { FS_Size = value; }
+            get { return FS_Block_Size; }
+            set { FS_Block_Size = value; }
         }
-
-        //Размер массива инодов
+        
         private int Inode_Size;
+        /// <summary>
+        /// Размер области инодов
+        /// </summary>
         public int Inode_Size_Property
         {
             get { return Inode_Size; }
             set { Inode_Size = value; }
         }
-
-
-        //Число свободных блоков
+        
         private int Block_Free;
+        /// <summary>
+        /// Количество свободных блоков
+        /// </summary>
         public int Block_Free_Property
         {
             get { return Block_Free; }
             set { Block_Free = value; }
         }
-
-        //Число свободных инодов
+        
         private int Inode_Free;
+        /// <summary>
+        /// Количество свободных инодов
+        /// </summary>
         public int Inode_Free_Property
         {
             get { return Inode_Free; }
             set { Inode_Free = value; }
         }
-
-        //Размер битовой карты инодов
+        
         private int Inode_Bitmap_Size;
+        /// <summary>
+        /// Размер области битовой карты инодов
+        /// </summary>
         public int Inode_Bitmap_Size_Property
         {
             get { return Inode_Bitmap_Size; }
             set { Inode_Bitmap_Size = value; }
         }
-
-        //Размер битовой карты
+        
         private int Bitmap_Size;
+        /// <summary>
+        /// Размер области битовой карты блоков
+        /// </summary>
         public int Bitmap_Size_Property
         {
             get { return Bitmap_Size; }
@@ -83,16 +98,23 @@ namespace S5FS
         }
 
 
-        //Данные не хранящиеся в ФС-------------------------------------------------------
+        //----------------------------------------Данные не хранящиеся в ФС-------------------------------------------------------
 
 
-        private List<int> numID=new List<int>();//Доступны ID
+        private List<int> numID=new List<int>();
+        /// <summary>
+        /// Доступные ID для пользователей
+        /// </summary>
         public List<int> numID_Property
         {
             get { return numID; }
             set { numID = value; }
         }
-        private List<int> numGroupID = new List<int>();//Доступные группы
+
+        private List<int> numGroupID = new List<int>();
+        /// <summary>
+        /// Доступные ID групп для пользователей
+        /// </summary>
         public List<int> numGroupID_Property
         {
             get { return numGroupID; }
@@ -101,70 +123,89 @@ namespace S5FS
 
         //Размер ЖД
         private int HDD_Size;
+        /// <summary>
+        /// Размер жесткого диска
+        /// </summary>
         public int HDD_Size_Property
         {
             get { return HDD_Size; }
             set { HDD_Size = value; }
         }
-
-        //Размер битовой карты блоков в блоках
+        
         private int Bitmap_Block_Size;
+        /// <summary>
+        /// Размер области битовой карты блоков в блоках
+        /// </summary>
         public int Bitmap_Block_Size_Property
         {
             get { return Bitmap_Block_Size; }
            set { Bitmap_Block_Size = value; }
         }
-
-        //Размер битовой карты инодов в блоках
+        
         private int Inode_Bitmap_Block_Size;
+        /// <summary>
+        /// Размер области битовой карты инодов в блоках
+        /// </summary>
         public int Inode_Bitmap_Block_Size_Property
         {
             get { return Inode_Bitmap_Block_Size; }
             set { Inode_Bitmap_Block_Size = value; }
         }
         
-        //Размер массива инодов в блоках
         private int Inode_Block_Size;
+        /// <summary>
+        /// Размер области инодов в блоках
+        /// </summary>
         public int Inode_Block_Size_Property
         {
             get { return Inode_Block_Size; }
             set { Inode_Block_Size = value; }
         }
-
-        //Размер информации пользователей в блоках
-        private int User_Info_Block;
-        public int User_Info_Block_Property
+        
+        private int User_Info_Block_Size;
+        /// <summary>
+        /// Размер области информации пользователей в блоках
+        /// </summary>
+        public int User_Info_Block_Size_Property
         {
-            get { return User_Info_Block; }
-            set { User_Info_Block = value; }
+            get { return User_Info_Block_Size; }
+            set { User_Info_Block_Size = value; }
         }
-
-        //Размер записей корневого каталога в блоках
-        private int Record_Block;
-        public int Record_Block_Property
+        
+        private int Record_Block_Size;
+        /// <summary>
+        /// Размер области записей корневого каталога в блоках
+        /// </summary>
+        public int Record_Block_Size_Property
         {
-            get { return Record_Block; }
-            set { Record_Block = value; }
+            get { return Record_Block_Size; }
+            set { Record_Block_Size = value; }
         }
-
-        //Размер данных в блоках
-        private int Data_Block;
-        public int Data_Block_Property
+        
+        private int Data_Block_Size;
+        /// <summary>
+        /// Размер области данных в блоках
+        /// </summary>
+        public int Data_Block_Size_Property
         {
-            get { return Data_Block; }
-            set { Data_Block = value; }
+            get { return Data_Block_Size; }
+            set { Data_Block_Size = value; }
         }
-
-        //Размер служебной части в блоках
-        private int Service_Block;
-        public int Service_Block_Property
+        
+        private int Service_Block_Size;
+        /// <summary>
+        /// Размер области служебной части в блоках
+        /// </summary>
+        public int Service_Block_Size_Property
         {
-            get { return Service_Block; }
-            set { Service_Block = value; }
+            get { return Service_Block_Size; }
+            set { Service_Block_Size = value; }
         }
-
-        //Количество пользователей
+        
         private int Number_Users;
+        /// <summary>
+        /// Количество пользователей
+        /// </summary>
         public int Number_Users_Property
         {
             get { return Number_Users; }

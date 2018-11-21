@@ -40,80 +40,104 @@ namespace S5FS
                 fs = File.Create(Path_Property);//Создание файла ФС по указаному пути
 
                 //ОПРЕДЕЛЕНИЕ СУПЕРБЛОКА
-                SB.HDD_Size_Property = hdd_size * 1024 * 1024;//524288000 Размер жесткого диска
-
+                SB.HDD_Size_Property = hdd_size * 1024 * 1024;//1 048 576 | Размер жесткого диска
                 SB.FS_Type_Property = "s5fs      ";//Название ФС
-                SB.Block_Size_Property = block_size;//4096 Размер 1 блока(кластера)
-                SB.FS_Size_Property = SB.HDD_Size_Property / SB.Block_Size_Property;//128 000 Размер ФС в блоках
-                SB.Inode_Size_Property = 68 * (SB.FS_Size_Property / 2);//4 352 000 Размер области массива инодов
-                SB.Block_Free_Property = SB.FS_Size_Property;//Количество свободных блоков
-                SB.Inode_Free_Property = (SB.FS_Size_Property / 2);//Количество свободных инодов
-                SB.Inode_Bitmap_Size_Property = (SB.FS_Size_Property / 2) / 8;//Размер битовой карты инодов
-                SB.Bitmap_Size_Property = (SB.FS_Size_Property / 8);//Размер битовой карты блоков
+                SB.One_Block_Size_Property = block_size;//4096 | Размер 1 блока(кластера)
+                SB.FS_Block_Size_Property = SB.HDD_Size_Property / SB.One_Block_Size_Property;//256 | Размер ФС в блоках
+                SB.Inode_Size_Property = 68 * (SB.FS_Block_Size_Property / 2);//8 704 | Размер области массива инодов
+                SB.Block_Free_Property = SB.FS_Block_Size_Property;//256 | Количество свободных блоков
+                SB.Inode_Free_Property = (SB.FS_Block_Size_Property / 2);//128 | Количество свободных инодов
+                SB.Inode_Bitmap_Size_Property = (SB.FS_Block_Size_Property / 2) / 8;//16 | Размер битовой карты инодов
+                SB.Bitmap_Size_Property = (SB.FS_Block_Size_Property / 8);//32 | Размер битовой карты блоков
                 /*var t = SB.GetType();
                 int TotalSizeSB = 0;
                 foreach (var prop in t.GetFields(System.Reflection.BindingFlags.Instance| System.Reflection.BindingFlags.NonPublic))
                 {
                     TotalSizeSB += System.Runtime.InteropServices.Marshal.SizeOf(prop.GetValue(SB));
                 }Подсчёт размера всех полей*/
+
+                //byte[] temp1 = BitConverter.GetBytes(SB.One_Block_Size_Property);
+                //byte[] temp2 = BitConverter.GetBytes(16385);
+                //byte[] temp3 = BitConverter.GetBytes(15);
+                //(BitConverter.IsLittleEndian)
+                
                 fs.Write(Encoding.ASCII.GetBytes(SB.FS_Type_Property), 0, Encoding.ASCII.GetBytes(SB.FS_Type_Property).Length);
-                fs.Write(BitConverter.GetBytes(SB.Block_Size_Property), 0, BitConverter.GetBytes(SB.Block_Size_Property).Length);
-                fs.Write(BitConverter.GetBytes(SB.FS_Size_Property), 0, BitConverter.GetBytes(SB.FS_Size_Property).Length);
+                fs.Write(BitConverter.GetBytes(SB.One_Block_Size_Property), 0, BitConverter.GetBytes(SB.One_Block_Size_Property).Length);
+                fs.Write(BitConverter.GetBytes(SB.FS_Block_Size_Property), 0, BitConverter.GetBytes(SB.FS_Block_Size_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.Inode_Size_Property), 0, BitConverter.GetBytes(SB.Inode_Size_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.Block_Free_Property), 0, BitConverter.GetBytes(SB.Block_Free_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.Inode_Free_Property), 0, BitConverter.GetBytes(SB.Inode_Free_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.Inode_Bitmap_Size_Property), 0, BitConverter.GetBytes(SB.Inode_Bitmap_Size_Property).Length);
                 fs.Write(BitConverter.GetBytes(SB.Bitmap_Size_Property), 0, BitConverter.GetBytes(SB.Bitmap_Size_Property).Length);
 
-                for (int i = 0; i < SB.Block_Size_Property - 36; i++)//Заполняем оставшийся суперблок нулями
+                for (int i = 0; i < SB.One_Block_Size_Property - 36; i++)//Заполняем оставшийся суперблок нулями
                     fs.WriteByte(0);
 
                 //ОПРЕДЕЛЕНИЕ БИТОВОЙ КАРТЫ БЛОКОВ
-                SB.Bitmap_Block_Size_Property = (SB.Bitmap_Size_Property / SB.Block_Size_Property) + 1;
-                for (int i = 0; i < (SB.Bitmap_Block_Size_Property * SB.Block_Size_Property); i++)
+                SB.Bitmap_Block_Size_Property = SB.Bitmap_Size_Property / SB.One_Block_Size_Property;// 1
+                if (SB.Bitmap_Size_Property % SB.One_Block_Size_Property!=0)
+                {
+                    SB.Bitmap_Block_Size_Property++;
+                }
+                for (int i = 0; i < (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property); i++)
                     fs.WriteByte(0);
 
 
                 //ОПРЕДЕЛЕНИЕ БИТОВОЙ КАРТЫ ИНОДОВ
-                SB.Inode_Bitmap_Block_Size_Property = (SB.Inode_Bitmap_Size_Property / SB.Block_Size_Property) + 1;
-                for (int i = 0; i < SB.Inode_Bitmap_Block_Size_Property * SB.Block_Size_Property; i++)
+                SB.Inode_Bitmap_Block_Size_Property = SB.Inode_Bitmap_Size_Property / SB.One_Block_Size_Property;//1
+                if(SB.Inode_Bitmap_Size_Property % SB.One_Block_Size_Property != 0)
+                {
+                    SB.Inode_Bitmap_Block_Size_Property++;
+                }
+                for (int i = 0; i < SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
 
                 //ОПРЕДЕЛЕНИЕ МАССИВА ИНОДОВ
-                SB.Inode_Block_Size_Property = (SB.Inode_Size_Property / SB.Block_Size_Property) + 1;
-                for (int i = 0; i < SB.Inode_Block_Size_Property * SB.Block_Size_Property; i++)
+                SB.Inode_Block_Size_Property = SB.Inode_Size_Property / SB.One_Block_Size_Property;//3
+                if (SB.Inode_Size_Property % SB.One_Block_Size_Property != 0)
+                {
+                    SB.Inode_Block_Size_Property++;
+                }
+                for (int i = 0; i < SB.Inode_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
 
                 //ОПРЕДЕЛЕНИЕ ИНФОРМАЦИИ ПОЛЬЗОВАТЕЛЕЙ
-                SB.User_Info_Block_Property = ((301 * 100) / SB.Block_Size_Property) + 1;
-                for (int i = 0; i < SB.User_Info_Block_Property * SB.Block_Size_Property; i++)
+                SB.User_Info_Block_Size_Property = (301 * 100) / SB.One_Block_Size_Property;//8
+                if ((301 * 100) % SB.One_Block_Size_Property != 0)
+                {
+                    SB.User_Info_Block_Size_Property++;
+                }
+                for (int i = 0; i < SB.User_Info_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
 
                 //ОПРЕДЕЛЕНИЕ ЗАПИСЕЙ КОРНЕВОГО КАТАЛОГА
-                SB.Record_Block_Property = ((29 * ((SB.FS_Size_Property / 2) / 2)) / SB.Block_Size_Property) + 1;
-                for (int i = 0; i < SB.Record_Block_Property * SB.Block_Size_Property; i++)
+                SB.Record_Block_Size_Property = (29 * ((SB.FS_Block_Size_Property / 2) / 2) + 100) / SB.One_Block_Size_Property;//1
+                if (((29 * ((SB.FS_Block_Size_Property / 2) / 2) + 100)) % SB.One_Block_Size_Property != 0)
+                {
+                    SB.Record_Block_Size_Property++;
+                }
+                for (int i = 0; i < SB.Record_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
 
                 //ОПРЕДЕЛЕНИЕ ДАННЫХ
-                SB.Data_Block_Property = SB.FS_Size_Property - 1 - SB.Bitmap_Block_Size_Property -
-                    SB.Inode_Bitmap_Block_Size_Property - SB.Inode_Block_Size_Property - SB.User_Info_Block_Property
-                    - SB.Record_Block_Property;
-                for (int i = 0; i < SB.Data_Block_Property * SB.Block_Size_Property; i++)
+                SB.Service_Block_Size_Property = 1 + SB.Bitmap_Block_Size_Property +//15
+                    SB.Inode_Bitmap_Block_Size_Property + SB.Inode_Block_Size_Property + SB.User_Info_Block_Size_Property
+                    + SB.Record_Block_Size_Property;
+
+                SB.Data_Block_Size_Property = SB.FS_Block_Size_Property - SB.Service_Block_Size_Property;//241
+                for (int i = 0; i < SB.Data_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
 
                 //РАЗМЕТКА БИТОВОЙ КАРТЫ БЛОКОВ
-                SB.Service_Block_Property = 1 + SB.Bitmap_Block_Size_Property +
-                    SB.Inode_Bitmap_Block_Size_Property + SB.Inode_Block_Size_Property + SB.User_Info_Block_Property
-                    + SB.Record_Block_Property;
                 CheckBitMap();
-                /*fs.Seek((1 * SB.Block_Size_Property), SeekOrigin.Begin);//Перемещаемся на позицию бит.карты блоков
+                /*fs.Seek((1 * SB.One_Block_Size_Property), SeekOrigin.Begin);//Перемещаемся на позицию бит.карты блоков
                 int countblock = 0;
-                for (int i = 0; i < SB.Bitmap_Block_Size_Property * SB.Block_Size_Property; i++)
+                for (int i = 0; i < SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property; i++)
                 {
                     string bits = "";
                     for (int j = 0; j < 8; j++)
                     {
-                        if (countblock < SB.Service_Block_Property)
+                        if (countblock < SB.Service_Block_Size_Property)
                         {
                             bits += '1';
                             SB.Block_Free_Property--;
@@ -146,7 +170,7 @@ namespace S5FS
                 inode.File_Size_Property = 0;
                 inode.File_Create_Property = DateTime.Now;
                 inode.File_Modif_Property = DateTime.Now;
-                inode.Block_Count_Property = SB.Data_Block_Property;
+                inode.Block_Count_Property = SB.Data_Block_Size_Property;
 
                 for (int i = 0; i < inode.A_Block_Address_Property.Length; i++)
                 {
@@ -183,7 +207,7 @@ namespace S5FS
             byte[] sb2 = new byte[2];
             for (int i = 0; i < 2; i++)
                 sb2[i] = (byte)fs.ReadByte();
-            SB.Block_Size_Property = BitConverter.ToUInt16(sb2,0);
+            SB.One_Block_Size_Property = BitConverter.ToUInt16(sb2,0);
 
         }
 
@@ -210,10 +234,10 @@ namespace S5FS
         public void AddUser(UserInfo u, Inode I)
         {
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
-                + SB.Inode_Block_Size_Property) * SB.Block_Size_Property), SeekOrigin.Begin);
+                + SB.Inode_Block_Size_Property) * SB.One_Block_Size_Property), SeekOrigin.Begin);
 
             UserInfo temp = new UserInfo();
-            for (int i = 0; i < (SB.User_Info_Block_Property * SB.Block_Size_Property); i = (i + 301))
+            for (int i = 0; i < (SB.User_Info_Block_Size_Property * SB.One_Block_Size_Property); i = (i + 301))
             {
                 temp = ReadUser();
                 if (temp.ID_Property == 0 && temp.Group_ID_Property == 0 && temp.Login_Property == (new string('\0', 12)) && temp.Hash_Property.SequenceEqual(new byte[32]) == true && temp.Homedir_Property == (new string('\0', 255)))
@@ -300,7 +324,7 @@ namespace S5FS
             //fs.Close();
             //fs = File.OpenRead(Path_Property);
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
-                + SB.Inode_Block_Size_Property) * SB.Block_Size_Property), SeekOrigin.Begin);
+                + SB.Inode_Block_Size_Property) * SB.One_Block_Size_Property), SeekOrigin.Begin);
             int r = 0;
             for (int i = 0; i < 100; i++)
             {
@@ -325,8 +349,8 @@ namespace S5FS
             int bitcount = 0;//отслеживаем текущее кол-во битов
             long CurPos = 0;//запоминаем следующую позицию записи в битовой карте блоков
             string bits = "";
-            SB.Block_Free_Property = SB.FS_Size_Property;
-            for (int i = 0; i < SB.FS_Size_Property; i++)
+            SB.Block_Free_Property = SB.FS_Block_Size_Property;
+            for (int i = 0; i < SB.FS_Block_Size_Property; i++)
             {
                 if (Busy100 > i)
                 {
@@ -337,7 +361,7 @@ namespace S5FS
                 {
                     //fs.Close();
                     //fs = File.OpenRead(Path_Property);
-                    fs.Seek(i * SB.Block_Size_Property, SeekOrigin.Begin);
+                    fs.Seek(i * SB.One_Block_Size_Property, SeekOrigin.Begin);
                     byte one = (byte)fs.ReadByte();
                     byte two = (byte)fs.ReadByte();
                     byte three = (byte)fs.ReadByte();
@@ -359,7 +383,7 @@ namespace S5FS
                     //fs.Close();
                     //fs = File.OpenWrite(Path_Property);
                     bitcount = 0;
-                    fs.Seek((1 * SB.Block_Size_Property) + CurPos, SeekOrigin.Begin);
+                    fs.Seek((1 * SB.One_Block_Size_Property) + CurPos, SeekOrigin.Begin);
                     fs.WriteByte(Convert.ToByte(bits, 2));
                     CurPos++;
                     bits = "";
@@ -373,11 +397,11 @@ namespace S5FS
             int bitcount = 0;//отслеживаем текущее кол-во битов
             long CurPos = 0;//запоминаем следующую позицию записи в битовой карте блоков
             string bits = "";
-            SB.Inode_Free_Property = SB.FS_Size_Property / 2;
-            for (int i = 0; i < (SB.FS_Size_Property / 2); i++)
+            SB.Inode_Free_Property = SB.FS_Block_Size_Property / 2;
+            for (int i = 0; i < (SB.FS_Block_Size_Property / 2); i++)
             {
-                fs.Seek(((1 * SB.Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.Block_Size_Property)
-                    + (SB.Inode_Bitmap_Block_Size_Property * SB.Block_Size_Property)) + i * 68, SeekOrigin.Begin);
+                fs.Seek(((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
+                    + (SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property)) + i * 68, SeekOrigin.Begin);
                 byte one = (byte)fs.ReadByte();
                 byte two = (byte)fs.ReadByte();
                 byte three = (byte)fs.ReadByte();
@@ -397,7 +421,7 @@ namespace S5FS
                 if (bitcount == 8)
                 {
                     bitcount = 0;
-                    fs.Seek((1 * SB.Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.Block_Size_Property) + CurPos, SeekOrigin.Begin);
+                    fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property) + CurPos, SeekOrigin.Begin);
                     fs.WriteByte(Convert.ToByte(bits, 2));
                     CurPos++;
                     bits = "";
@@ -408,8 +432,8 @@ namespace S5FS
         public int getFreeInode()
         {
             int I = 0;
-            fs.Seek((1 * SB.Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.Block_Size_Property), SeekOrigin.Begin);
-            for (int i = 0; i < ((SB.FS_Size_Property / 2) / 8); i++)
+            fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property), SeekOrigin.Begin);
+            for (int i = 0; i < ((SB.FS_Block_Size_Property / 2) / 8); i++)
             {
                 byte one = (byte)fs.ReadByte();
                 string bin = Convert.ToString(one, 2);
@@ -430,13 +454,13 @@ namespace S5FS
         }
         public void CreateRecord(string homedir, string exstension, Inode I)
         {
-            fs.Seek((1 * SB.Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.Block_Size_Property)
-                + (SB.Inode_Bitmap_Block_Size_Property * SB.Block_Size_Property)
-                + (SB.Inode_Block_Size_Property * SB.Block_Size_Property)
-                + (SB.User_Info_Block_Property * SB.Block_Size_Property), SeekOrigin.Begin);
+            fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
+                + (SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
+                + (SB.Inode_Block_Size_Property * SB.One_Block_Size_Property)
+                + (SB.User_Info_Block_Size_Property * SB.One_Block_Size_Property), SeekOrigin.Begin);
 
             RootDirRecord temp = new RootDirRecord();
-            for (int i = 0; i < (SB.Record_Block_Property * SB.Block_Size_Property); i = (i + 29))
+            for (int i = 0; i < (SB.Record_Block_Size_Property * SB.One_Block_Size_Property); i = (i + 29))
             {
                 temp = ReadRecord();
                 if (temp.Name_Property == (new string('\0', 20)) && temp.Exstension_Property == (new string('\0', 5)) && temp.Number_Inode_Property==0)
@@ -455,8 +479,8 @@ namespace S5FS
 
         public void AddInode(Inode I)
         {
-            fs.Seek((1 * SB.Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.Block_Size_Property)
-                + (SB.Inode_Bitmap_Block_Size_Property * SB.Block_Size_Property)
+            fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
+                + (SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
                 + (I.Number_Property * 68), SeekOrigin.Begin);
 
 
