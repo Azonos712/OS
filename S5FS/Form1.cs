@@ -55,7 +55,7 @@ namespace S5FS
             FolderBrowserDialog fbd = new FolderBrowserDialog();//предлагает пользователю выбрать папку
             if (fbd.ShowDialog() == DialogResult.OK)
             {
-                Em.Path_Property= fbd.SelectedPath + "\\FS.txt";//приписываем к пути выходной файл
+                Em.Path_Property= fbd.SelectedPath + "\\FS.fs";//приписываем к пути выходной файл
                 textBox_path.Text = Em.Path_Property;//отображает выбранный путь на форме
             }
         }

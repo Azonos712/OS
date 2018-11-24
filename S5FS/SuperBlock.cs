@@ -13,8 +13,8 @@ namespace S5FS
             for (int i = 0; i < 100; i++)
                 numID_Property.Add(i);
 
-            for (int i = 0; i < 2; i++)
-                numGroupID_Property.Add(i);
+            //for (int i = 0; i < 2; i++)
+               //numGroupID_Property.Add(i);
         }
         
         private string FS_Type;

@@ -30,6 +30,10 @@ namespace S5FS
                         temp.ID_Property = (byte)main.Em1.SB.numID_Property.First();
                         main.Em1.SB.numID_Property.Remove(temp.ID_Property);
                         temp.Group_ID_Property = 1;
+                        if (main.Em1.SB.numGroupID_Property.Contains(temp.Group_ID_Property) != true)
+                        {
+                            main.Em1.SB.numGroupID_Property.Add(temp.Group_ID_Property);
+                        }
                         temp.Login_Property = textBox2.Text.ToString();
                         temp.Login_Property += (new string(' ', 12 - temp.Login_Property.Length));
                         temp.Hash_Property = main.Em1.getHashSHA256(textBox1.Text.ToString());

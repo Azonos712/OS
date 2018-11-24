@@ -37,6 +37,9 @@ namespace S5FS
                     break;
                 case 2:
                     MessageBox.Show("Вы вошли в систему!");
+                    Work w = new Work();
+                    w.Owner = this;
+                    w.ShowDialog();
                     break;
             }
             //Em1.fs_Property.Close();
