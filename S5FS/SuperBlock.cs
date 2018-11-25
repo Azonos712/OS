@@ -10,8 +10,7 @@ namespace S5FS
     {
         public SuperBlock()
         {
-            for (int i = 0; i < 100; i++)
-                numID_Property.Add(i);
+            
 
             //for (int i = 0; i < 2; i++)
                //numGroupID_Property.Add(i);
@@ -204,12 +203,32 @@ namespace S5FS
         
         private int Number_Users;
         /// <summary>
-        /// Количество пользователей
+        /// Количество пользователей в системе
         /// </summary>
         public int Number_Users_Property
         {
             get { return Number_Users; }
             set { Number_Users = value; }
+        }
+
+        private int Max_Number_Users;
+        /// <summary>
+        /// Максимальное количество пользователей в системе
+        /// </summary>
+        public int Max_Number_Users_Property
+        {
+            get { return Max_Number_Users; }
+            set { Max_Number_Users = value; }
+        }
+
+        private int Available;
+        /// <summary>
+        /// Доступные записи в зависимости от размера одного блока
+        /// </summary>
+        public int Available_Property
+        {
+            get { return Available; }
+            set { Available = value; }
         }
     }
 }

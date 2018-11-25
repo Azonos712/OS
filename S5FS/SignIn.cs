@@ -26,7 +26,6 @@ namespace S5FS
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //Em1.fs_Property = File.OpenRead(Em1.Path_Property);//Чтение файла ФС по указаному пути
             switch (Em1.CheckUser(textBox2.Text.ToString(), textBox1.Text.ToString()))
             {
                 case 0:
