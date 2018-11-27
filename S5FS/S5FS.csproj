@@ -52,6 +52,12 @@
     <Compile Include="Create.Designer.cs">
       <DependentUpon>Create.cs</DependentUpon>
     </Compile>
+    <Compile Include="CreateFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateFile.Designer.cs">
+      <DependentUpon>CreateFile.cs</DependentUpon>
+    </Compile>
     <Compile Include="Emulator.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -77,6 +83,12 @@
     </Compile>
     <Compile Include="SuperBlock.cs" />
     <Compile Include="UserInfo.cs" />
+    <Compile Include="UserManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserManager.Designer.cs">
+      <DependentUpon>UserManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Work.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +97,9 @@
     </Compile>
     <EmbeddedResource Include="Create.resx">
       <DependentUpon>Create.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateFile.resx">
+      <DependentUpon>CreateFile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -103,6 +118,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SignUp.resx">
       <DependentUpon>SignUp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserManager.resx">
+      <DependentUpon>UserManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Work.resx">
       <DependentUpon>Work.cs</DependentUpon>

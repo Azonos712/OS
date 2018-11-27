@@ -16,22 +16,28 @@ namespace S5FS
         {
             InitializeComponent();
         }
-        private Emulator emul = new Emulator();
-        internal Emulator EMUL { get => emul; set => emul = value; }
+        //private Emulator emul = new Emulator();
+        //internal Emulator EMUL { get => emul; set => emul = value; }
+
+
+
+        private void создатьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateFile CF = new CreateFile();
+            //CF.Owner = this;
+            CF.ShowDialog();
+        }
+
+        private void менеджерПользователейToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UserManager UM = new UserManager();
+            UM.Owner = this;
+            UM.ShowDialog();
+        }
 
         private void Work_Load(object sender, EventArgs e)
         {
-            SignIn main = this.Owner as SignIn;
-            if (main != null)
-            {
-                EMUL = main.Em1;
-                main.Hide();
-            }
-        }
 
-        private void Work_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
         }
     }
 }

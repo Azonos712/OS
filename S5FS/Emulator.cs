@@ -9,40 +9,63 @@ using System.Security.Cryptography;
 
 namespace S5FS
 {
-    class Emulator
+    static class Emulator
     {
         //Путь к файлу
-        private string Path;
-        public string Path_Property
+        private static string Path;
+        public static string Path_Property
         {
             get { return Path; }
             set { Path = value; }
         }
 
-        //объект файла
-        private FileStream FS;
-        public FileStream fs
+        //Объект файла
+        private static FileStream FS;
+        public static FileStream fs
         {
             get { return FS; }
             set { FS = value; }
         }
 
         //Объект суперблока
-        private SuperBlock sb = new SuperBlock();
-        internal SuperBlock SB { get => sb; set => sb = value; }
+        private static SuperBlock sb = new SuperBlock();
+        internal static SuperBlock SB { get => sb; set => sb = value; }
 
         //Текущий пользователь
-        private UserInfo CU;
-        public UserInfo CurrentUser
+        private static UserInfo CU;
+        public static UserInfo CurrentUser
         {
             get { return CU; }
             set { CU = value; }
         }
 
-        public void CreateMainFile(int hdd_size, ushort block_size)
+        //Смещение текущей записи
+        private static long CPR;
+        public static long cpr
+        {
+            get { return CPR; }
+            set { CPR = value; }
+        }
+
+        //Смещение текущего положения в корне
+        private static long CP;
+        public static long CurrentPosition
+        {
+            get { return CP; }
+            set { CP = value; }
+        }
+
+        //Инод текущей записи
+        //private long CIR;
+        //public long cir
+        //{
+        //    get { return CIR; }
+        //    set { CIR = value; }
+        //}
+
+        public static void CreateMainFile(int hdd_size, ushort block_size)
         {
             fs = null;
-
             try
             {
                 //fs = File.Open(Path_Property, FileMode.Open, FileShare.None);
@@ -114,7 +137,7 @@ namespace S5FS
                 root.Homedir_Property += (new string(' ', 255 - root.Homedir_Property.Length));
 
                 Inode inode = new Inode();
-                inode.Access_Property = setAccess("01110000000110");
+                inode.Access_Property = setAccess("0111000000011");
                 inode.User_ID_Property = root.ID_Property;
                 inode.Group_ID_Property = root.Group_ID_Property;
                 inode.File_Size_Property = 0;
@@ -143,7 +166,8 @@ namespace S5FS
 
         }
 
-        public void ReadMainFile()
+
+        public static void ReadMainFile()
         {
             fs = new FileStream(Path_Property, FileMode.Open);
 
@@ -170,9 +194,10 @@ namespace S5FS
                     SB.numGroupID_Property.Add(temp.Group_ID_Property);
                 }
             }
+            
         }
 
-        public void Designation()
+        public static void Designation()
         {
             //ОПРЕДЕЛЕНИЕ БИТОВОЙ КАРТЫ БЛОКОВ
             SB.Bitmap_Block_Size_Property = SB.Bitmap_Size_Property / SB.One_Block_Size_Property;// 
@@ -222,7 +247,7 @@ namespace S5FS
             }
             for (int i = 0; i < SB.Max_Number_Users_Property; i++)
                 SB.numID_Property.Add(i);
-            //MessageBox.Show(SB.Max_Number_Users_Property.ToString());
+            MessageBox.Show(SB.Max_Number_Users_Property.ToString());
             //ОПРЕДЕЛЕНИЕ ИНФОРМАЦИИ ПОЛЬЗОВАТЕЛЕЙ
             SB.User_Info_Block_Size_Property = (301 * SB.Max_Number_Users_Property) / SB.One_Block_Size_Property;//8
             if ((301 * SB.Max_Number_Users_Property) % SB.One_Block_Size_Property != 0)
@@ -242,7 +267,8 @@ namespace S5FS
             //ОПРЕДЕЛЕНИЕ ОБЛАСТИ ДАННЫХ
             SB.Data_Block_Size_Property = SB.FS_Block_Size_Property - SB.Service_Block_Size_Property;//241
         }
-        public SuperBlock ReadSuperBlock()
+
+        public static SuperBlock ReadSuperBlock()
         {
             SuperBlock temp = new SuperBlock();
             byte[] sb1 = new byte[10];
@@ -278,17 +304,17 @@ namespace S5FS
             byte[] sb7 = new byte[4];
             for (int i = 0; i < 4; i++)
                 sb7[i] = (byte)fs.ReadByte();
-            temp.Bitmap_Size_Property = BitConverter.ToInt32(sb7, 0);
+            temp.Inode_Bitmap_Size_Property = BitConverter.ToInt32(sb7, 0);
 
             byte[] sb8 = new byte[4];
             for (int i = 0; i < 4; i++)
                 sb6[i] = (byte)fs.ReadByte();
-            temp.Inode_Bitmap_Size_Property = BitConverter.ToInt32(sb6, 0);
+            temp.Bitmap_Size_Property = BitConverter.ToInt32(sb6, 0);
 
             return temp;
         }
 
-        public byte[] getHashSHA256(string text)
+        public static byte[] getHashSHA256(string text)
         {
             byte[] B = Encoding.ASCII.GetBytes(text);
             SHA256Managed H = new SHA256Managed();
@@ -301,14 +327,14 @@ namespace S5FS
             return Hb;
         }
 
-        public ushort setAccess(string bin)
+        public static ushort setAccess(string bin)
         {
             bin += new string('0', 16 - bin.Length);
             ushort nbin = Convert.ToUInt16(bin, 2);
             return nbin;
         }
 
-        public void AddUser(UserInfo u, Inode I)
+        public static void AddUser(UserInfo u, Inode I)
         {
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
                 + SB.Inode_Block_Size_Property) * SB.One_Block_Size_Property), SeekOrigin.Begin);
@@ -342,10 +368,9 @@ namespace S5FS
             r.Exstension_Property = ".dir ";
             r.Number_Inode_Property = I.Number_Property;
             CreateRecord(r, I);
-            CheckBitMap();
         }
 
-        public UserInfo ReadUser()
+        public static UserInfo ReadUser()
         {
             UserInfo temp = new UserInfo();
             byte[] u1 = new byte[1];
@@ -376,7 +401,7 @@ namespace S5FS
             return temp;
         }
 
-        public RootDirRecord ReadRecord()
+        public static RootDirRecord ReadRecord()
         {
             RootDirRecord temp = new RootDirRecord();
             byte[] r1 = new byte[20];
@@ -397,12 +422,12 @@ namespace S5FS
             return temp;
         }
 
-        public int CheckUser(string login, string password)
+        public static int CheckUser(string login, string password)
         {
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
                 + SB.Inode_Block_Size_Property) * SB.One_Block_Size_Property), SeekOrigin.Begin);
             int r = 0;
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < SB.Max_Number_Users_Property; i++)
             {
                 UserInfo temp = ReadUser();
                 if (login.Replace(" ", string.Empty) == temp.Login_Property.Replace(" ", string.Empty))
@@ -411,6 +436,7 @@ namespace S5FS
                     if (temp.Hash_Property.SequenceEqual(getHashSHA256(password)) == true)
                     {
                         r++;
+                        CurrentUser = temp;
                     }
                     return r;
                 }
@@ -419,7 +445,7 @@ namespace S5FS
             return r;
         }
 
-        public void CheckBitMap()
+        public static void CheckBitMap()
         {
             int bitcount = 0;//отслеживаем текущее кол-во битов
             long CurPos = 0;//запоминаем следующую позицию записи в битовой карте блоков
@@ -467,7 +493,7 @@ namespace S5FS
 
         }
 
-        public void CheckBitMapInode()
+        public static void CheckBitMapInode()
         {
             int bitcount = 0;//отслеживаем текущее кол-во битов
             long CurPos = 0;//запоминаем следующую позицию записи в битовой карте блоков
@@ -507,7 +533,7 @@ namespace S5FS
             fs.Write(BitConverter.GetBytes(SB.Inode_Free_Property), 0, BitConverter.GetBytes(SB.Inode_Free_Property).Length);
         }
 
-        public int getFreeInode()
+        public static int getFreeInode()
         {
             int I = 0;
             fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property), SeekOrigin.Begin);
@@ -530,7 +556,30 @@ namespace S5FS
             }
             return -1;
         }
-        public void CreateRecord(RootDirRecord R, Inode I)
+        public static int getFreeBlock()
+        {
+            int B = 0;
+            fs.Seek((1 * SB.One_Block_Size_Property), SeekOrigin.Begin);
+            for (int i = 0; i < ((SB.FS_Block_Size_Property) / 8); i++)
+            {
+                byte one = (byte)fs.ReadByte();
+                string bin = Convert.ToString(one, 2);
+                if (bin.Length < 8)
+                {
+                    bin = new string('0', 8 - bin.Length) + bin;
+                }
+                for (int j = 0; j < 8; j++)
+                {
+                    if (bin[j] == '0')
+                    {
+                        return B;
+                    }
+                    B++;
+                }
+            }
+            return -1;
+        }
+        public static void CreateRecord(RootDirRecord R, Inode I)
         {
             fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
                 + (SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
@@ -548,14 +597,17 @@ namespace S5FS
                 }
             }
 
+            cpr = fs.Position;
+            //cir = R.Number_Inode_Property;
             fs.Write(Encoding.ASCII.GetBytes(R.Name_Property), 0, Encoding.ASCII.GetBytes(R.Name_Property).Length);
             fs.Write(Encoding.ASCII.GetBytes(R.Exstension_Property), 0, Encoding.ASCII.GetBytes(R.Exstension_Property).Length);
             fs.Write(BitConverter.GetBytes(R.Number_Inode_Property), 0, BitConverter.GetBytes(R.Number_Inode_Property).Length);
 
             AddInode(I);
+            CheckBitMap();
         }
 
-        public void AddInode(Inode I)
+        public static void AddInode(Inode I)
         {
             fs.Seek((1 * SB.One_Block_Size_Property) + (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
                 + (SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property)
@@ -579,6 +631,79 @@ namespace S5FS
             }
 
             CheckBitMapInode();
+        }
+
+        public static void Bind(int cir)
+        {
+            int seektemp = 0;
+            byte[] temp;
+            fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property) + (cir * 68) + 28, SeekOrigin.Begin);
+            for (int k=0;k<10;k++)
+            {
+                if (k == 9)
+                {
+                    temp = new byte[4];
+                    for (int i = 0; i < 4; i++)
+                        temp[i] = (byte)fs.ReadByte();
+                    seektemp = BitConverter.ToInt32(temp, 0);
+                    if (seektemp == 0)
+                    {
+                        long saveseek = fs.Position;
+                        int freetemp = getFreeBlock();
+                        fs.Seek(saveseek, SeekOrigin.Begin);
+                        fs.Seek(-4, SeekOrigin.Current);
+                        byte[] test = BitConverter.GetBytes(freetemp * SB.One_Block_Size_Property);
+                        fs.Write(BitConverter.GetBytes(freetemp * SB.One_Block_Size_Property), 0, BitConverter.GetBytes(freetemp * SB.One_Block_Size_Property).Length);
+                        fs.Seek(freetemp * SB.One_Block_Size_Property, SeekOrigin.Begin);
+                    }
+                    else
+                    {
+                        fs.Seek(seektemp, SeekOrigin.Begin);
+                    }
+                    for(int j = 0; j < SB.Available_Property; j++)
+                    {
+                        temp = new byte[4];
+                        for (int i = 0; i < 4; i++)
+                            temp[i] = (byte)fs.ReadByte();
+                        seektemp = BitConverter.ToInt32(temp, 0);
+                        if (seektemp == 0)
+                        {
+                            fs.Seek(-4, SeekOrigin.Current);
+                            fs.Write(BitConverter.GetBytes(cpr), 0, BitConverter.GetBytes(cpr).Length);
+                            break;
+                        }
+
+                    }
+                    break;
+                }
+
+                temp = new byte[4];
+                for (int i = 0; i < 4; i++)
+                    temp[i] = (byte)fs.ReadByte();
+                seektemp = BitConverter.ToInt32(temp, 0);
+                if (seektemp == 0)
+                {
+                    fs.Seek(-4, SeekOrigin.Current);
+                    fs.Write(BitConverter.GetBytes(cpr), 0, BitConverter.GetBytes(cpr).Length);
+                    break;
+                }
+            }
+
+            CheckBitMap();
+        }
+
+        public static void SetCurrentPosition()
+        {
+            fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property + SB.Inode_Block_Size_Property + SB.User_Info_Block_Size_Property) * SB.One_Block_Size_Property, SeekOrigin.Begin);
+            for (int a=0; a < (SB.Max_Number_Users_Property * SB.Available_Property); a++)
+            {
+                RootDirRecord temp = ReadRecord();
+                if(temp.Name_Property.Replace(" ", string.Empty) == CurrentUser.Homedir_Property.Replace(" ", string.Empty) && temp.Exstension_Property == ".dir ")
+                {
+                    fs.Seek(-29, SeekOrigin.Current);
+                    CurrentPosition = fs.Position;
+                }
+            }
         }
     }
 }

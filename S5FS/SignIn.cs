@@ -19,14 +19,10 @@ namespace S5FS
             InitializeComponent();
         }
 
-        private Emulator em1 = new Emulator();
-        internal Emulator Em1 { get => em1; set => em1 = value; }
-        
-
-
         private void button1_Click(object sender, EventArgs e)
         {
-            switch (Em1.CheckUser(textBox2.Text.ToString(), textBox1.Text.ToString()))
+            
+            switch (Emulator.CheckUser(textBox2.Text.ToString(), textBox1.Text.ToString()))
             {
                 case 0:
                     MessageBox.Show("Неверное имя пользователя!");
@@ -36,34 +32,19 @@ namespace S5FS
                     break;
                 case 2:
                     MessageBox.Show("Вы вошли в систему!");
-                    Work w = new Work();
-                    w.Owner = this;
-                    w.ShowDialog();
+                    Emulator.SetCurrentPosition();
+
+                    Program.Context.MainForm = new Work();
+                    this.Close();
+                    Program.Context.MainForm.Show();
                     break;
             }
-            //Em1.fs_Property.Close();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             SignUp su = new SignUp();
-            su.Owner = this;
             su.ShowDialog();
-        }
-
-        private void SignIn_Load(object sender, EventArgs e)
-        {
-            Form1 main = this.Owner as Form1;
-            if (main != null)
-            {
-                Em1 = main.Em;
-                main.Hide();
-            }
-        }
-
-        private void SignIn_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
         }
     }
 }
