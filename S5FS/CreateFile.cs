@@ -43,9 +43,9 @@ namespace S5FS
             inode.File_Modif_Property = Convert.ToDateTime(textBox6.Text);
             inode.Block_Count_Property = 0;
 
-            for (int i = 0; i < inode.A_Block_Address_Property.Length; i++)
+            for (int i = 0; i < inode.Array_Of_Address_Property.Length; i++)
             {
-                inode.A_Block_Address_Property[i] = 0;
+                inode.Array_Of_Address_Property[i] = 0;
             }
             inode.Number_Property = Emulator.getFreeInode();
 

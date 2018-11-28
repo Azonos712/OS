@@ -101,19 +101,19 @@ namespace S5FS
 
                 for (int i = 0; i < (SB.Bitmap_Block_Size_Property * SB.One_Block_Size_Property); i++)
                     fs.WriteByte(0);
-                
+
                 for (int i = 0; i < SB.Inode_Bitmap_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
-                
+
                 for (int i = 0; i < SB.Inode_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
-                
+
                 for (int i = 0; i < SB.User_Info_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
-                
+
                 for (int i = 0; i < SB.Record_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
-                
+
                 for (int i = 0; i < SB.Data_Block_Size_Property * SB.One_Block_Size_Property; i++)
                     fs.WriteByte(0);
 
@@ -145,9 +145,9 @@ namespace S5FS
                 inode.File_Modif_Property = DateTime.Now;
                 inode.Block_Count_Property = SB.Record_Block_Size_Property;
 
-                for (int i = 0; i < inode.A_Block_Address_Property.Length; i++)
+                for (int i = 0; i < inode.Array_Of_Address_Property.Length; i++)
                 {
-                    inode.A_Block_Address_Property[i] = 0;
+                    inode.Array_Of_Address_Property[i] = 0;
                 }
                 inode.Number_Property = getFreeInode();
 
@@ -194,7 +194,7 @@ namespace S5FS
                     SB.numGroupID_Property.Add(temp.Group_ID_Property);
                 }
             }
-            
+
         }
 
         public static void Designation()
@@ -334,6 +334,14 @@ namespace S5FS
             return nbin;
         }
 
+        public static string getAccess(ushort nbin)
+        {
+            string bin = Convert.ToString(nbin, 2);
+            bin = new string('0', 16 - bin.Length) + bin;
+            return bin;
+        }
+
+
         public static void AddUser(UserInfo u, Inode I)
         {
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property//задаём смещение к сектору пользователей
@@ -363,11 +371,60 @@ namespace S5FS
             SB.Number_Users_Property++;
 
             RootDirRecord r = new RootDirRecord();
-            r.Name_Property = u.Homedir_Property.Replace(" ", string.Empty);
+            r.Name_Property = u.Login_Property.Replace(" ", string.Empty);
             r.Name_Property += (new string(' ', 20 - r.Name_Property.Length));
             r.Exstension_Property = ".dir ";
             r.Number_Inode_Property = I.Number_Property;
             CreateRecord(r, I);
+        }
+
+        public static Inode ReadInode()
+        {
+            Inode temp = new Inode();
+            byte[] i1 = new byte[2];
+            for (int i = 0; i < 2; i++)
+                i1[i] = (byte)fs.ReadByte();
+            temp.Access_Property = BitConverter.ToUInt16(i1, 0);
+
+            byte[] i2 = new byte[1];
+            for (int i = 0; i < 1; i++)
+                i2[i] = (byte)fs.ReadByte();
+            temp.User_ID_Property = i2[0];
+
+            byte[] i3 = new byte[1];
+            for (int i = 0; i < 1; i++)
+                i3[i] = (byte)fs.ReadByte();
+            temp.Group_ID_Property = i3[0];
+
+            byte[] i4 = new byte[4];
+            for (int i = 0; i < 4; i++)
+                i4[i] = (byte)fs.ReadByte();
+            temp.File_Size_Property = BitConverter.ToInt32(i4, 0);
+
+            byte[] i5 = new byte[8];
+            for (int i = 0; i < 8; i++)
+                i5[i] = (byte)fs.ReadByte();
+            temp.File_Create_Property = new DateTime(BitConverter.ToInt64(i5, 0));
+
+            byte[] i6 = new byte[8];
+            for (int i = 0; i < 8; i++)
+                i6[i] = (byte)fs.ReadByte();
+            temp.File_Modif_Property = new DateTime(BitConverter.ToInt64(i6, 0));
+
+            byte[] i7 = new byte[4];
+            for (int i = 0; i < 4; i++)
+                i7[i] = (byte)fs.ReadByte();
+            temp.Block_Count_Property = BitConverter.ToInt32(i7, 0);
+
+            for (int k = 0; k < 10; k++)
+            {
+                byte[] i8 = new byte[4];
+                for (int i = 0; i < 4; i++)
+                    i8[i] = (byte)fs.ReadByte();
+                temp.Array_Of_Address_Property[k] = BitConverter.ToInt32(i8, 0);
+            }
+
+            return temp;
         }
 
         public static UserInfo ReadUser()
@@ -625,9 +682,9 @@ namespace S5FS
             fs.Write(BitConverter.GetBytes(I.File_Create_Property.Ticks), 0, BitConverter.GetBytes(I.File_Create_Property.Ticks).Length);
             fs.Write(BitConverter.GetBytes(I.File_Modif_Property.Ticks), 0, BitConverter.GetBytes(I.File_Modif_Property.Ticks).Length);
             fs.Write(BitConverter.GetBytes(I.Block_Count_Property), 0, BitConverter.GetBytes(I.Block_Count_Property).Length);
-            for (int i = 0; i < I.A_Block_Address_Property.Length; i++)
+            for (int i = 0; i < I.Array_Of_Address_Property.Length; i++)
             {
-                fs.Write(BitConverter.GetBytes(I.A_Block_Address_Property[i]), 0, BitConverter.GetBytes(I.A_Block_Address_Property[i]).Length);
+                fs.Write(BitConverter.GetBytes(I.Array_Of_Address_Property[i]), 0, BitConverter.GetBytes(I.Array_Of_Address_Property[i]).Length);
             }
 
             CheckBitMapInode();
@@ -638,7 +695,7 @@ namespace S5FS
             int seektemp = 0;
             byte[] temp;
             fs.Seek(((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property) + (cir * 68) + 28, SeekOrigin.Begin);
-            for (int k=0;k<10;k++)
+            for (int k = 0; k < 10; k++)
             {
                 if (k == 9)
                 {
@@ -660,7 +717,7 @@ namespace S5FS
                     {
                         fs.Seek(seektemp, SeekOrigin.Begin);
                     }
-                    for(int j = 0; j < SB.Available_Property; j++)
+                    for (int j = 0; j < SB.Available_Property; j++)
                     {
                         temp = new byte[4];
                         for (int i = 0; i < 4; i++)
@@ -695,15 +752,196 @@ namespace S5FS
         public static void SetCurrentPosition()
         {
             fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property + SB.Inode_Block_Size_Property + SB.User_Info_Block_Size_Property) * SB.One_Block_Size_Property, SeekOrigin.Begin);
-            for (int a=0; a < (SB.Max_Number_Users_Property * SB.Available_Property); a++)
+            for (int a = 0; a < (SB.Max_Number_Users_Property * SB.Available_Property); a++)
             {
                 RootDirRecord temp = ReadRecord();
-                if(temp.Name_Property.Replace(" ", string.Empty) == CurrentUser.Homedir_Property.Replace(" ", string.Empty) && temp.Exstension_Property == ".dir ")
+                if (temp.Name_Property.Replace(" ", string.Empty) == CurrentUser.Homedir_Property.Replace(" ", string.Empty) && temp.Exstension_Property == ".dir ")
                 {
                     fs.Seek(-29, SeekOrigin.Current);
                     CurrentPosition = fs.Position;
                 }
             }
         }
+
+        public static void DeleteUser(string login, string id)
+        {
+            //переходим к области пользователей
+            fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property + SB.Inode_Block_Size_Property) * SB.One_Block_Size_Property, SeekOrigin.Begin);
+            for (int y = 0; y < SB.Max_Number_Users_Property; y++)
+            {
+                UserInfo tempU = ReadUser();
+                if (tempU.Login_Property.Replace(" ", string.Empty) == login && tempU.ID_Property == Convert.ToInt32(id))
+                {
+                    SB.numID_Property.Add(tempU.ID_Property);//Добавляем освободившийся ID
+                    SB.numID_Property.Sort();//сортируем доступные ID
+                    fs.Seek(-301, SeekOrigin.Current);//удаляем этого пользователя
+                    for (int f = 0; f < 301; f++)
+                        fs.WriteByte(0);
+                    //Удаляем все записи и папку связанные с этим пользователем(начинаем с root директории)
+                    DeleteAllInDir((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property, tempU);
+
+                    break;
+                }
+            }
+        }
+
+        public static void DeleteAllInDir(long S, UserInfo U)
+        {
+            //Переходим в область хранения инодов,к нужной папке
+            fs.Seek(S, SeekOrigin.Begin);
+            Inode MainInode = ReadInode();
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (MainInode.Array_Of_Address_Property[i] != 0)
+                {
+                    if (i == 9)
+                    {
+                        fs.Seek(MainInode.Array_Of_Address_Property[i], SeekOrigin.Begin);
+                        for (int g = 0; g < SB.One_Block_Size_Property / 4; g++)
+                        {
+                            byte[] tempArray = new byte[4];
+                            for (int w = 0; w < 4; w++)
+                                tempArray[w] = (byte)fs.ReadByte();
+                            long CurPos = fs.Position;
+                            int tempSeek = BitConverter.ToInt32(tempArray, 0);
+
+                            //Удаление записи,инода,привязки
+                            if (tempSeek != 0)
+                            {
+                                DeleteRIB(MainInode.Array_Of_Address_Property[i], tempSeek, U, g);
+                                fs.Seek(CurPos, SeekOrigin.Begin);
+                            }
+                        }
+                        break;
+                    }
+                    //Удаление записи,инода,привязки
+                    DeleteRIB(S + 28, MainInode.Array_Of_Address_Property[i], U, i);
+
+                }
+            }
+            CheckBitMapInode();
+            CheckBitMap();
+        }
+
+        public static void DeleteRIB(long mainfolder, int current, UserInfo user, int number)
+        {
+            fs.Seek(current, SeekOrigin.Begin);
+            RootDirRecord tempR = ReadRecord();
+            fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property + 68 * tempR.Number_Inode_Property, SeekOrigin.Begin);
+            Inode tempI = ReadInode();
+            if (tempI.User_ID_Property == user.ID_Property)
+            {
+                string tempAccess = getAccess(tempI.Access_Property);
+                if (Char.GetNumericValue(tempAccess[0]) == 0)
+                {
+                    //если папка,запускаем рекурсию для удаления файлов внутри папки
+                    DeleteAllInDir((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property + 68 * tempR.Number_Inode_Property, user);
+                }
+                //производим удаление
+                //сначала инод
+                fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property + 68 * tempR.Number_Inode_Property, SeekOrigin.Begin);
+                for (int z = 0; z < 68; z++)
+                    fs.WriteByte(0);
+                //Затем сама запись
+                fs.Seek(current, SeekOrigin.Begin);
+                for (int s = 0; s < 29; s++)
+                    fs.WriteByte(0);
+                //И наконец адрес в массиве привязок
+                fs.Seek(mainfolder + 4 * number, SeekOrigin.Begin);
+                for (int a = 0; a < 4; a++)
+                    fs.WriteByte(0);
+            }
+        }
+
+        public static void Delete()
+        {
+            fs.Seek(CurrentPosition, SeekOrigin.Begin);
+        }
+
+        public static void ChangeUserGroup(string login, string id, byte newgroup)
+        {
+            //переходим к области пользователей
+            fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property + SB.Inode_Block_Size_Property) * SB.One_Block_Size_Property, SeekOrigin.Begin);
+            for (int y = 0; y < SB.Max_Number_Users_Property; y++)
+            {
+                UserInfo tempU = ReadUser();
+                if (tempU.Login_Property.Replace(" ", string.Empty) == login && tempU.ID_Property == Convert.ToInt32(id))
+                {
+                    if (SB.numGroupID_Property.Contains(newgroup) == false)
+                    {
+                        SB.numGroupID_Property.Add(newgroup);//Добавляем новый ID группы
+                        SB.numGroupID_Property.Sort();//сортируем ID группы
+                    }
+                    fs.Seek(-300, SeekOrigin.Current);
+                    fs.WriteByte(newgroup);
+
+                    ChangeUserGroupAllInDir((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property, tempU, newgroup);
+
+                    break;
+                }
+            }
+        }
+
+        public static void ChangeUserGroupAllInDir(long S, UserInfo U, byte numg)
+        {
+            //Переходим в область хранения инодов,к нужной папке
+            fs.Seek(S, SeekOrigin.Begin);
+            Inode MainInode = ReadInode();
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (MainInode.Array_Of_Address_Property[i] != 0)
+                {
+                    if (i == 9)
+                    {
+                        fs.Seek(MainInode.Array_Of_Address_Property[i], SeekOrigin.Begin);
+                        for (int g = 0; g < SB.One_Block_Size_Property / 4; g++)
+                        {
+                            byte[] tempArray = new byte[4];
+                            for (int w = 0; w < 4; w++)
+                                tempArray[w] = (byte)fs.ReadByte();
+                            long CurPos = fs.Position;
+                            int tempSeek = BitConverter.ToInt32(tempArray, 0);
+
+                            //Изменение записи,инода,привязки
+                            if (tempSeek != 0)
+                            {
+                                ChangeUserGroupInode(tempSeek, U, numg);
+                                fs.Seek(CurPos, SeekOrigin.Begin);
+                            }
+                        }
+                        break;
+                    }
+                    //Изменение записи,инода,привязки
+                    ChangeUserGroupInode(MainInode.Array_Of_Address_Property[i], U, numg);
+
+                }
+            }
+
+        }
+
+        public static void ChangeUserGroupInode(int current, UserInfo user, byte numg)
+        {
+            fs.Seek(current, SeekOrigin.Begin);
+            RootDirRecord tempR = ReadRecord();
+            fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property + 68 * tempR.Number_Inode_Property, SeekOrigin.Begin);
+            Inode tempI = ReadInode();
+            if (tempI.User_ID_Property == user.ID_Property)
+            {
+                string tempAccess = getAccess(tempI.Access_Property);
+                
+                if (Char.GetNumericValue(tempAccess[0]) == 0)
+                {
+                    //если папка,запускаем рекурсию для изменения файлов внутри папки
+                    ChangeUserGroupAllInDir((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property + 68 * tempR.Number_Inode_Property, user, numg);
+                }
+                //производим изменение инода
+                fs.Seek((1 + SB.Bitmap_Block_Size_Property + SB.Inode_Bitmap_Block_Size_Property) * SB.One_Block_Size_Property + 68 * tempR.Number_Inode_Property, SeekOrigin.Begin);
+                fs.Seek(3, SeekOrigin.Current);
+                fs.WriteByte(numg);
+            }
+        }
+
     }
 }
