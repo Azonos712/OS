@@ -32,7 +32,7 @@ namespace S5FS
                     break;
                 case 2:
                     MessageBox.Show("Вы вошли в систему!");
-                    Emulator.SetCurrentPosition();
+                    Emulator.SetCurrentPosition("root");
 
                     Program.Context.MainForm = new Work();
                     this.Close();

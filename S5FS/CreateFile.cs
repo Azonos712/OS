@@ -40,7 +40,7 @@ namespace S5FS
             inode.Group_ID_Property = Convert.ToByte(textBox4.Text);
             inode.File_Size_Property = Convert.ToInt32(textBox5.Text);
             inode.File_Create_Property = Convert.ToDateTime(textBox6.Text);
-            inode.File_Modif_Property = Convert.ToDateTime(textBox6.Text);
+            inode.File_Modif_Property = Convert.ToDateTime(textBox7.Text);
             inode.Block_Count_Property = 0;
 
             for (int i = 0; i < inode.Array_Of_Address_Property.Length; i++)
@@ -58,6 +58,7 @@ namespace S5FS
 
             this.Close();
             Emulator.CreateRecord(rec, inode);
+            Emulator.Bind(Emulator.RecCurPos.Number_Inode_Property);
         }
 
         private void CreateFile_Load(object sender, EventArgs e)
@@ -66,6 +67,7 @@ namespace S5FS
                 textBox4.Text = Emulator.CurrentUser.Group_ID_Property.ToString();
                 textBox5.Text = 0.ToString();
                 textBox6.Text = DateTime.Now.ToString();
+                textBox7.Text = DateTime.Now.ToString();
         }
     }
 }

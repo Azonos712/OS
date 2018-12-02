@@ -44,7 +44,7 @@ namespace S5FS
                                 temp.Homedir_Property += (new string(' ', 255 - temp.Homedir_Property.Length));
 
                                 Inode inode = new Inode();
-                                inode.Access_Property = Emulator.setAccess("0111111000000");
+                                inode.Access_Property = Emulator.setAccess("0111000000000");
                                 inode.User_ID_Property = temp.ID_Property;
                                 inode.Group_ID_Property = temp.Group_ID_Property;
                                 inode.File_Size_Property = 0;
