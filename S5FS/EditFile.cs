@@ -31,8 +31,15 @@ namespace S5FS
             if (main != null)
             {
                 temptext = main.SelectFile;
-                richTextBox1.Text= Emulator.ReadData(temptext);
-                
+                richTextBox1.Text = Emulator.ReadData(temptext);
+
+                RootDirRecord tempR = Emulator.FindRec(main.SelectFile);
+                Inode tempI = Emulator.FindInode(tempR.Number_Inode_Property);
+                if (Emulator.CheckWriteAccess(Emulator.CurrentUser, tempI) == false)
+                {
+                    richTextBox1.Enabled = false;
+                    button1.Enabled = false;
+                }
             }
 
         }

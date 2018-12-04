@@ -20,6 +20,12 @@ namespace S5FS
         private void button1_Click(object sender, EventArgs e)
         {
             Inode inode = new Inode();
+            if (checkBox1.Checked == true)
+            {
+                checkBox7.Checked = false;
+                checkBox8.Checked = false;
+                checkBox9.Checked = false;
+            }
             string acc = "1";
             acc += (checkBox4.Checked == true) ? '1' : '0';
             acc += (checkBox7.Checked == true) ? '1' : '0';
@@ -52,22 +58,29 @@ namespace S5FS
             RootDirRecord rec = new RootDirRecord();
             rec.Name_Property = textBox1.Text;
             rec.Name_Property += (new string(' ', 20 - rec.Name_Property.Length));
-            rec.Exstension_Property = textBox2.Text;
+            rec.Exstension_Property = '.' + textBox2.Text;
             rec.Exstension_Property += (new string(' ', 5 - rec.Exstension_Property.Length));
             rec.Number_Inode_Property = inode.Number_Property;
 
-            this.Close();
-            Emulator.CreateRecord(rec, inode);
-            Emulator.Bind(Emulator.RecCurPos.Number_Inode_Property);
+            if (Emulator.CheckRecord(rec.Name_Property.Replace(" ", string.Empty), rec.Exstension_Property.Replace(" ", string.Empty)) == true)
+            {
+                this.Close();
+                Emulator.CreateRecord(rec, inode);
+                Emulator.Bind(Emulator.RecCurPos.Number_Inode_Property);
+            }
+            else
+            {
+                MessageBox.Show("Запись с таким именем уже существует!");
+            }
         }
 
         private void CreateFile_Load(object sender, EventArgs e)
         {
-                textBox3.Text = Emulator.CurrentUser.ID_Property.ToString();
-                textBox4.Text = Emulator.CurrentUser.Group_ID_Property.ToString();
-                textBox5.Text = 0.ToString();
-                textBox6.Text = DateTime.Now.ToString();
-                textBox7.Text = DateTime.Now.ToString();
+            textBox3.Text = Emulator.CurrentUser.ID_Property.ToString();
+            textBox4.Text = Emulator.CurrentUser.Group_ID_Property.ToString();
+            textBox5.Text = 0.ToString();
+            textBox6.Text = DateTime.Now.ToString();
+            textBox7.Text = DateTime.Now.ToString();
         }
     }
 }
