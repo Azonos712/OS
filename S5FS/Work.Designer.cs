@@ -33,6 +33,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.системаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.менеджерПользователейToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.отображатьСкрытыеФайлыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.создатьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,7 +56,7 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.listView1 = new System.Windows.Forms.ListView();
             this.imageList2 = new System.Windows.Forms.ImageList(this.components);
-            this.отображатьСкрытыеФайлыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.планировщикToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -79,7 +80,8 @@
             // 
             this.системаToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.менеджерПользователейToolStripMenuItem,
-            this.отображатьСкрытыеФайлыToolStripMenuItem});
+            this.отображатьСкрытыеФайлыToolStripMenuItem,
+            this.планировщикToolStripMenuItem});
             this.системаToolStripMenuItem.Name = "системаToolStripMenuItem";
             this.системаToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
             this.системаToolStripMenuItem.Text = "Система";
@@ -87,9 +89,17 @@
             // менеджерПользователейToolStripMenuItem
             // 
             this.менеджерПользователейToolStripMenuItem.Name = "менеджерПользователейToolStripMenuItem";
-            this.менеджерПользователейToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.менеджерПользователейToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
             this.менеджерПользователейToolStripMenuItem.Text = "Менеджер пользователей";
             this.менеджерПользователейToolStripMenuItem.Click += new System.EventHandler(this.менеджерПользователейToolStripMenuItem_Click);
+            // 
+            // отображатьСкрытыеФайлыToolStripMenuItem
+            // 
+            this.отображатьСкрытыеФайлыToolStripMenuItem.CheckOnClick = true;
+            this.отображатьСкрытыеФайлыToolStripMenuItem.Name = "отображатьСкрытыеФайлыToolStripMenuItem";
+            this.отображатьСкрытыеФайлыToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.отображатьСкрытыеФайлыToolStripMenuItem.Text = "Отображать скрытые файлы";
+            this.отображатьСкрытыеФайлыToolStripMenuItem.Click += new System.EventHandler(this.отображатьСкрытыеФайлыToolStripMenuItem_Click);
             // 
             // файлToolStripMenuItem
             // 
@@ -298,13 +308,12 @@
             this.imageList2.Images.SetKeyName(3, "file_sys.png");
             this.imageList2.Images.SetKeyName(4, "file_sys_transparent.png");
             // 
-            // отображатьСкрытыеФайлыToolStripMenuItem
+            // планировщикToolStripMenuItem
             // 
-            this.отображатьСкрытыеФайлыToolStripMenuItem.CheckOnClick = true;
-            this.отображатьСкрытыеФайлыToolStripMenuItem.Name = "отображатьСкрытыеФайлыToolStripMenuItem";
-            this.отображатьСкрытыеФайлыToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
-            this.отображатьСкрытыеФайлыToolStripMenuItem.Text = "Отображать скрытые файлы";
-            this.отображатьСкрытыеФайлыToolStripMenuItem.Click += new System.EventHandler(this.отображатьСкрытыеФайлыToolStripMenuItem_Click);
+            this.планировщикToolStripMenuItem.Name = "планировщикToolStripMenuItem";
+            this.планировщикToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.планировщикToolStripMenuItem.Text = "Планировщик";
+            this.планировщикToolStripMenuItem.Click += new System.EventHandler(this.планировщикToolStripMenuItem_Click);
             // 
             // Work
             // 
@@ -362,5 +371,6 @@
         private System.Windows.Forms.ToolStripMenuItem вставитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem свойстваToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem отображатьСкрытыеФайлыToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem планировщикToolStripMenuItem;
     }
 }

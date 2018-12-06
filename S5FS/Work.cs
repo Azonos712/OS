@@ -460,5 +460,12 @@ namespace S5FS
         {
             RefreshTreeList();
         }
+
+        private void планировщикToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Program.Context.MainForm = new Plan();
+            this.Close();
+            Program.Context.MainForm.Show();
+        }
     }
 }

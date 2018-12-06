@@ -33,7 +33,7 @@ namespace S5FS
             listView1.Columns.Add("ID пользователя", 100);
             listView1.Columns.Add("ID группы", 70);
             listView1.Columns.Add("Домашняя директория", 130);
-            listView1.Columns.Add("Тип пользователя",110);
+            listView1.Columns.Add("Тип пользователя", 110);
 
 
             Emulator.fs.Seek((1 + Emulator.SB.Bitmap_Block_Size_Property + Emulator.SB.Inode_Bitmap_Block_Size_Property + Emulator.SB.Inode_Block_Size_Property) * Emulator.SB.One_Block_Size_Property, SeekOrigin.Begin);
@@ -124,35 +124,43 @@ namespace S5FS
                 int index = listView1.SelectedIndices[0];
                 if (listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty) == Emulator.CurrentUser.ID_Property.ToString() || (Emulator.CurrentUser.Group_ID_Property == 0))
                 {
-                    if (listView1.Items[index].SubItems[2].Text.Replace(" ", string.Empty) != 0.ToString())
+                    if (listView1.Items[index].SubItems[2].Text.Replace(" ", string.Empty) != 0.ToString() || (listView1.Items[index].SubItems[2].Text.Replace(" ", string.Empty) == 0.ToString() && listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty) == Emulator.CurrentUser.ID_Property.ToString()) || Emulator.CurrentUser.ID_Property == 0)
+                    //if (listView1.Items[index].SubItems[2].Text.Replace(" ", string.Empty) == 0.ToString() && listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty) == Emulator.CurrentUser.ID_Property.ToString() && listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty) != 0.ToString() || listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty) == Emulator.CurrentUser.ID_Property.ToString())
                     {
-                        Group G = new Group();
-                        G.Owner = this;
-                        G.ShowDialog();
-                        if ((temp1 == 0 && Emulator.CurrentUser.Group_ID_Property == 0) || temp1!=0)
+                        if (listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty) != 0.ToString())
                         {
-                            if (temp1 != Convert.ToInt32(listView1.Items[index].SubItems[2].Text.Replace(" ", string.Empty)))
+                            Group G = new Group();
+                            G.Owner = this;
+                            G.ShowDialog();
+                            if ((temp1 == 0 && Emulator.CurrentUser.Group_ID_Property == 0) || temp1 != 0)
                             {
-                                Emulator.ChangeUserGroup(listView1.Items[index].SubItems[0].Text.Replace(" ", string.Empty), listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty), temp1);
-                                if (Emulator.CurrentUser.ID_Property.ToString() == listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty))
+                                if (temp1 != Convert.ToInt32(listView1.Items[index].SubItems[2].Text.Replace(" ", string.Empty)))
                                 {
-                                    Emulator.CurrentUser.Group_ID_Property = temp1;
+                                    Emulator.ChangeUserGroup(listView1.Items[index].SubItems[0].Text.Replace(" ", string.Empty), listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty), temp1);
+                                    if (Emulator.CurrentUser.ID_Property.ToString() == listView1.Items[index].SubItems[1].Text.Replace(" ", string.Empty))
+                                    {
+                                        Emulator.CurrentUser.Group_ID_Property = temp1;
+                                    }
+                                    MessageBox.Show("Изменение группы завершено!");
                                 }
-                                MessageBox.Show("Изменение группы завершено!");
+                                else
+                                {
+                                    MessageBox.Show("Вы изменяете группу на тоже значение!");
+                                }
                             }
                             else
                             {
-                                MessageBox.Show("Вы изменяете группу на тоже значение!");
+                                MessageBox.Show("В группу администраторов могут добавить только администраторы!");
                             }
                         }
                         else
                         {
-                            MessageBox.Show("В группу администраторов могут добавить только администраторы!");
+                            MessageBox.Show("Группу пользователя root невозможно изменить!");
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Группу администратора невозможно изменить");
+                        MessageBox.Show("Можно изменить только свою группу администратора!");
                     }
                 }
                 else

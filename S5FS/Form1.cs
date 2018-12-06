@@ -15,6 +15,7 @@ namespace S5FS
         public Form1()
         {
             InitializeComponent();
+            //this.EnableBlur
         }
         
         public int temp1;

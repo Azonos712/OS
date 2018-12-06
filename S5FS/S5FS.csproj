@@ -81,6 +81,13 @@
       <DependentUpon>Group.cs</DependentUpon>
     </Compile>
     <Compile Include="Inode.cs" />
+    <Compile Include="Plan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Plan.Designer.cs">
+      <DependentUpon>Plan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Process.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Prop.cs">
       <SubType>Form</SubType>
@@ -130,6 +137,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Group.resx">
       <DependentUpon>Group.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Plan.resx">
+      <DependentUpon>Plan.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prop.resx">
       <DependentUpon>Prop.cs</DependentUpon>
